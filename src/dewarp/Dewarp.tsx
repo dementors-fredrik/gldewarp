@@ -21,6 +21,10 @@ export const Dewarp = ({ src }: DewarpProps) => {
             outputCanvas.current.onmousemove = (ev) => {
                 (controller as any).moveHandler({pageX: (ev.offsetX-256), pageY: ev.offsetY-256});
             }
+            outputCanvas.current.onwheel = (ev) => {
+                (controller as any).wheelHandler(ev);
+                ev.preventDefault();
+            }
             // Set ceiling orientation mode of the viewer
             viewer.mode = axisdewarp.modes.CEILING;
             (viewer as any).start();

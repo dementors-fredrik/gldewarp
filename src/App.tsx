@@ -8,7 +8,7 @@ function App() {
     return (
         <div className="App">
             <Dewarp src={srcImg}/>
-            <img ref={srcImg} src={img} style={{display: 'none'}} width={256} height={256}/>
+            <img ref={srcImg} src={img} style={{display: 'none'}}/>
         </div>
     );
 }

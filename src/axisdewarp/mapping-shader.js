@@ -1,5 +1,5 @@
 export const frag = `
-precision mediump float;
+precision highp float;
 const float PI = 3.1415926535897932384626433832795;
 
 uniform vec2 size;                  /// native resolution, x is width, y is height
@@ -101,7 +101,7 @@ void main(void)
 }`;
 
 export const vert = `
-precision mediump float;
+precision highp float;
 attribute vec2 position;
 varying vec2 uv;
 

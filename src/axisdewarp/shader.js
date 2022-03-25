@@ -6,12 +6,21 @@ uniform sampler2D mapTexture;
 
 varying vec2 uv;
 
+vec4 getInterpolatedTexel(sampler2D tex, vec2 p, float resolution) {
+    vec2 uv = p;
+    uv = uv * resolution + 0.5;
+    vec2 iuv = floor( uv ); 
+    vec2 fuv = fract( uv );
+    uv = iuv + fuv*fuv*(3.0-2.0*fuv); 
+    uv = (uv - 0.5)/resolution;
+    return vec4(texture2D( tex, uv ).xyz,1.0);
+}
+
+
 void main(void)
-{
-  vec2 texturePos = texture2D(mapTexture, uv).rg;
-
-  gl_FragColor = vec4(texture2D(texture, texturePos).rgb, 1.0);
-
+{  
+    vec2 texturePos = getInterpolatedTexel(mapTexture,uv, 256.0).rg;
+    gl_FragColor = getInterpolatedTexel(texture, texturePos, 1024.0);
 }`;
 
 export const vert = `

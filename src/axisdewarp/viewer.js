@@ -1,7 +1,9 @@
-import Regl from "regl";
-import * as shader from "./shader";
-import * as V from "./vector";
-import * as modes from "./modes";
+import Regl from 'regl';
+
+import * as mappingShader from './mapping-shader';
+import * as modes from './modes';
+import * as shader from './shader';
+import * as V from './vector';
 
 const PI = Math.PI
 const QUADRANT = PI / 2;
@@ -91,15 +93,23 @@ export default function(src, params, canvas) {
     mode: modes.CEILING,
   };
 
-  const regl = Regl(canvas);
+  const regl = Regl({ canvas, extensions: ['OES_texture_float'] });
   const texture = regl.texture({ shape: params.streamSize });
 
-  const draw = regl({
-    ...shader,
+  const mapTexture = regl.texture({ shape: [params.streamSize[0], params.streamSize[1], 4], type: 'float'});
+
+  const fbo = regl.framebuffer({
+    color: mapTexture,
+    depth: false,
+    stencil: false,
+  })
+
+  const drawMap = regl({
+    ...mappingShader,
     attributes: { position: [1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1] },
     count: 6,
+    framebuffer: fbo,
     uniforms: {
-      texture: regl.prop("texture"),
       size: regl.prop("size"),
       tangentOfFieldOfView: regl.prop("tangentOfFOV"),
       lambdaOffset: regl.prop("lambdaOffset"),
@@ -111,21 +121,49 @@ export default function(src, params, canvas) {
     depth: { enable: false },
   });
 
+  const draw = regl({
+    ...shader,
+    attributes: {
+      position: [0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1]
+    },
+    count: 6,
+    uniforms: {
+      size: regl.prop("size"),
+      width: regl.context("viewportWidth"),
+      height: regl.context("viewportHeight"),
+      texture: regl.prop("texture"),
+      mapTexture: regl.prop("mapTexture")
+    },
+    depth: { enable: false },
+  });
+
+  viewer.updateMap = function () {
+    const tangentOfFOV = Math.tan(viewer.ptz[2]);
+
+    drawMap({
+      size: params.size,
+      tangentOfFOV,
+      lambdaOffset: getLambdaOffset(viewer.mode),
+      rotateData: getRotateData(viewer.mode, viewer.ptz),
+      lensProfile: extendLensProfile(params.lensProfile),
+    });
+  }
   /*
    * Render a single frame to the output canvas, copying the source element
    * to the texture.
    */
   viewer.render = function() {
     const subimg = texture.subimage(src);
-    const tangentOfFOV = Math.tan(viewer.ptz[2]);
 
     draw({
-      texture: subimg,
       size: params.size,
-      tangentOfFOV,
-      lambdaOffset: getLambdaOffset(viewer.mode),
-      rotateData: getRotateData(viewer.mode, viewer.ptz),
-      lensProfile: extendLensProfile(params.lensProfile),
+      texture: subimg,
+      mapTexture: mapTexture
     });
   };
 
@@ -159,7 +197,8 @@ export default function(src, params, canvas) {
   };
 
   viewer.setPtz = function (ptz) {
-    viewer.ptz = clampPtz(viewer.mode, ptz)
+    viewer.ptz = clampPtz(viewer.mode, ptz);
+    viewer.updateMap();
   }
 
   viewer.getPtz = function () {

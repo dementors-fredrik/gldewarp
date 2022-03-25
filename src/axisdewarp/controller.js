@@ -1,4 +1,4 @@
-import * as V from "./vector";
+import * as V from './vector';
 
 const [MAX_ZOOM, MIN_ZOOM] = V.degToRad([60, 2])
 const ZOOM_STEP = (MAX_ZOOM - MIN_ZOOM) / 20.0;

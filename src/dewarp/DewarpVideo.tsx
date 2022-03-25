@@ -1,4 +1,4 @@
-import React, {MutableRefObject, RefObject, useEffect, useRef, useState} from 'react';
+import React, { MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
 
 import axisdewarp from '../axisdewarp';
 
@@ -21,7 +21,7 @@ type DewarpProps = {
 }
 
 function attachController(viewer: any, outputCanvas: React.MutableRefObject<HTMLCanvasElement>) {
-    var controller = axisdewarp.controller(viewer) as any;
+    var controller = axisdewarp.controller(viewer, {speed: 0.5}) as any;
     let trackMovement = false;
     outputCanvas.current.onmousedown = (ev) => {
         trackMovement = true;

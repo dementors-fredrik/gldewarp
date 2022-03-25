@@ -28,6 +28,10 @@ function attachController(viewer: any, outputCanvas: React.MutableRefObject<HTML
     }
     outputCanvas.current.onmouseup = (ev) => {
         trackMovement = false;
+        controller.moveHandler({
+            pageX: 0,
+            pageY: 0
+        });
     }
     outputCanvas.current.onmousemove = (ev) => {
         if (trackMovement) {

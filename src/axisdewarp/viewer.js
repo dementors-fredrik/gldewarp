@@ -93,10 +93,10 @@ export default function(src, params, canvas) {
     mode: modes.CEILING,
   };
 
-  const regl = Regl({ canvas, extensions: ['OES_texture_float', 'WEBGL_color_buffer_float'] });
+  const regl = Regl({ canvas, extensions: ['OES_texture_float', 'OES_texture_float_linear', 'WEBGL_color_buffer_float'] });
   const texture = regl.texture({ shape: params.streamSize });
 
-  const mapTexture = regl.texture({ shape: [512, 512, 4], type: 'float'});
+  const mapTexture = regl.texture({ shape: [1024, 1024, 4], type: 'float'});
 
   const fbo = regl.framebuffer({
     color: mapTexture,

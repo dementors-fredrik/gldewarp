@@ -53,12 +53,17 @@ export const DewarpVideo = ({ src, lensProfile, size, ptzParams}: DewarpProps) =
 
     useEffect(() => {
         if (src.current && outputCanvas.current) {
-          setViewer(axisdewarp.viewer(src.current, {
+            const vtmp = axisdewarp.viewer(src.current, {
               streamSize:[src.current.videoWidth, src.current.videoHeight],
               size:[size.width, size.height],
               lensProfile: [0, lensProfile.x, lensProfile.y, lensProfile.z]
               },
-              outputCanvas.current) as any);
+              outputCanvas.current) as any;
+            setViewer(vtmp);
+            return () => {
+                console.log('Killing context');
+                vtmp.destroy();
+            }
         }
     }, [src, outputCanvas, lensProfile, size.width, size.height, ptzParams.x, ptzParams.y, ptzParams.fov]);
 

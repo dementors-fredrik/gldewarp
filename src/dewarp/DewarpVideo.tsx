@@ -1,4 +1,4 @@
-import React, { MutableRefObject, RefObject, useEffect, useRef } from 'react';
+import React, {MutableRefObject, RefObject, useEffect, useRef, useState} from 'react';
 
 import axisdewarp from '../axisdewarp';
 
@@ -20,32 +20,58 @@ type DewarpProps = {
   }
 }
 
+function attachController(viewer: any, outputCanvas: React.MutableRefObject<HTMLCanvasElement>) {
+    var controller = axisdewarp.controller(viewer) as any;
+    let trackMovement = false;
+    outputCanvas.current.onmousedown = (ev) => {
+        trackMovement = true;
+    }
+    outputCanvas.current.onmouseup = (ev) => {
+        trackMovement = false;
+    }
+    outputCanvas.current.onmousemove = (ev) => {
+        if (trackMovement) {
+            controller.moveHandler({
+                pageX: (ev.offsetX - (outputCanvas.current.width / 2)),
+                pageY: ev.offsetY - (outputCanvas.current.height / 2)
+            });
+        }
+    }
+    outputCanvas.current.onwheel = (ev) => {
+        controller.wheelHandler(ev);
+        ev.preventDefault();
+    }
+}
+
 export const DewarpVideo = ({ src, lensProfile, size, ptzParams}: DewarpProps) => {
     const outputCanvas = useRef<HTMLCanvasElement>(null) as MutableRefObject<HTMLCanvasElement>;
+    const [viewer, setViewer] = useState<any>(null);
 
     useEffect(() => {
         if (src.current && outputCanvas.current) {
-          const viewer = axisdewarp.viewer(src.current, {
+          setViewer(axisdewarp.viewer(src.current, {
               streamSize:[src.current.videoWidth, src.current.videoHeight],
               size:[size.width, size.height],
               lensProfile: [0, lensProfile.x, lensProfile.y, lensProfile.z]
               },
-              outputCanvas.current);
-          var controller = axisdewarp.controller(viewer);
-          outputCanvas.current.onmousemove = (ev) => {
-              (controller as any).moveHandler({pageX: (ev.offsetX-512), pageY: ev.offsetY-512});
-          }
-          outputCanvas.current.onwheel = (ev) => {
-              (controller as any).wheelHandler(ev);
-              ev.preventDefault();
-          }
-          (viewer as any).setPtz([ptzParams.x, ptzParams.y, ptzParams.fov]);
-          // Set ceiling orientation mode of the viewer
-          viewer.mode = axisdewarp.modes.CEILING;
-          (viewer as any).start();
-
+              outputCanvas.current) as any);
         }
-    }, [src,outputCanvas, lensProfile]);
+    }, [src, outputCanvas, lensProfile, size.width, size.height, ptzParams.x, ptzParams.y, ptzParams.fov]);
+
+    useEffect(() => {
+        if(viewer) {
+            attachController(viewer, outputCanvas);
+            viewer.mode = axisdewarp.modes.CEILING;
+            viewer.start();
+            (window as any).vv = viewer;
+        }
+    },[viewer]);
+
+    useEffect(() => {
+        if(viewer) {
+            viewer.setPtz([ptzParams.x, ptzParams.y, ptzParams.fov]);
+        }
+    }, [viewer, ptzParams]);
 
     return <canvas ref={outputCanvas} width={1024} height={1024}/>;
 }

@@ -14,18 +14,18 @@ function App() {
 
     return (
         <>
-        <div style={{position: 'absolute', left: '50%', top: '50vh', zIndex: 10000}}>
-            <button onClick={() => srcVideo.current.play()}>Play</button>
-        </div>
         <div className="App" style={{ display: 'flex' }}>
             <div style={{width: "50%"}}>
-            {isLoaded ? <>
-                <DewarpVideo src={srcVideo} lensProfile={{ x: 113.889694, y: -60.882477, z: 751.488831 }} size={{ width: 2992, height: 2992 }} ptzParams={{ x: 0, y: 0, fov: 0 }} />
-            </>
-                    : undefined}
+            {isLoaded && <>
+                <div style={{ display: 'inline'}}>
+                    <DewarpVideo src={srcVideo} lensProfile={{ x: 113.889694, y: -60.882477, z: 751.488831 }} size={{ width: 2992, height: 2992 }} ptzParams={{ x: 4.109286700809463, y: -0.9885839816668688, fov: 0.8351400470792861 }} />
+                    <DewarpVideo src={srcVideo} lensProfile={{ x: 113.889694, y: -60.882477, z: 751.488831 }} size={{ width: 2992, height: 2992 }} ptzParams={{ x: 3.0893633177948168, y: -0.5402625725217155, fov: 0.39648062841137827 }} />
+                </div>
+            </>}
             </div>
             <div style={{width: "50%"}}>
-                <video ref={srcVideo} src={video} loop onLoadedMetadata={onLoaded} style={{width: "100%"}}/>
+                <video ref={srcVideo} src={video} loop muted={true} autoPlay={true} onLoadedMetadata={onLoaded} style={{position: 'fixed',
+                    width: "20%", left: '50%', top: 0}}/>
             </div>
             </div>
             </>

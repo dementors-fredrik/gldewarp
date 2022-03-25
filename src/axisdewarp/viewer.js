@@ -93,10 +93,11 @@ export default function(src, params, canvas) {
     mode: modes.CEILING,
   };
 
-  const regl = Regl({ canvas, extensions: ['OES_texture_float'] });
-  const texture = regl.texture({ shape: params.streamSize });
+  const regl = Regl({ canvas, extensions: ['OES_texture_float', 'oes_texture_float_linear'] });
+  const texture = regl.texture({ shape: params.streamSize, min: "linear", mag: "linear"  });
 
-  const mapTexture = regl.texture({ shape: [params.streamSize[0], params.streamSize[1], 4], type: 'float'});
+  const mapTexture = regl.texture({ shape: [256, 256, 4], type: 'float', min: "linear", mag: "linear", color: [0, 0, 0, 1] });
+
 
   const fbo = regl.framebuffer({
     color: mapTexture,
@@ -119,6 +120,7 @@ export default function(src, params, canvas) {
       height: regl.context("viewportHeight"),
     },
     depth: { enable: false },
+
   });
 
   const draw = regl({
@@ -159,7 +161,7 @@ export default function(src, params, canvas) {
    */
   viewer.render = function() {
     const subimg = texture.subimage(src);
-
+    regl.clear({color: [0, 0, 0, 1]});
     draw({
       size: params.size,
       texture: subimg,

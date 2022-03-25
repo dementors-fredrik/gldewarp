@@ -54,9 +54,13 @@ export const DewarpVideo = ({ src, lensProfile, size, ptzParams}: DewarpProps) =
               size:[size.width, size.height],
               lensProfile: [0, lensProfile.x, lensProfile.y, lensProfile.z]
               },
-              outputCanvas.current) as any);
+            outputCanvas.current) as any);
+
+          return () => {
+            viewer.destroy();
+          }
         }
-    }, [src, outputCanvas, lensProfile, size.width, size.height, ptzParams.x, ptzParams.y, ptzParams.fov]);
+    }, [src, outputCanvas, lensProfile, size.width, size.height]);
 
     useEffect(() => {
         if(viewer) {

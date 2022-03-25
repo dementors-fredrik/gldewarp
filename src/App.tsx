@@ -14,7 +14,7 @@ function App() {
 
     return (
         <>
-        <div className="App" style={{ display: 'flex'}}>
+        <div className="App" style={{ display: 'flex', width: '100%'}}>
             <div style={{width: "50%"}}>
             {isLoaded && <>
                 <div style={{ display: 'inline'}}>
@@ -25,7 +25,7 @@ function App() {
             </div>
             <div style={{width: "50%"}}>
                 <video ref={srcVideo} src={video} loop muted={true} autoPlay={true} onLoadedMetadata={onLoaded} style={{position: 'fixed',
-                    width: "50%", left: '50%', top: 0}}/>
+                    width: "calc(100% - 1024px)", left: '1024px', top: 0}}/>
             </div>
             </div>
             </>

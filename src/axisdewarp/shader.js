@@ -9,8 +9,7 @@ varying vec2 uv;
 void main(void)
 {
   vec2 texturePos = texture2D(mapTexture, uv).rg;
-
-  vec3 color = texture2D(texture, texturePos).rgb * float(texturePos.x > 0.0 && texturePos.y > 0.0);
+  vec3 color = texture2D(texture, texturePos).rgb;
   gl_FragColor = vec4(color, 1.0);
 
 }`;

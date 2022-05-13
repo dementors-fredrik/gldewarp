@@ -93,10 +93,12 @@ export default function(src, params, canvas) {
     mode: modes.CEILING,
   };
 
-  const regl = Regl({ canvas, extensions: ['OES_texture_float', 'oes_texture_float_linear'] });
+ // const regl = Regl({ canvas, extensions: ['OES_texture_float', 'WEBGL_color_buffer_float', 'oes_texture_float_linear'] });
+
+  const regl = Regl({ gl: canvas.getContext( 'webgl2', { antialias: true } ), canvas, extensions: [] });
   const texture = regl.texture({ shape: params.streamSize, min: "linear", mag: "linear"  });
 
-  const mapTexture = regl.texture({ shape: [256, 256, 4], type: 'float', min: "linear", mag: "linear", color: [0, 0, 0, 1] });
+  const mapTexture = regl.texture({ shape: [256, 256, 4], type: 'uint32', min: "linear", mag: "linear", color: [0, 0, 0, 1] });
 
 
   const fbo = regl.framebuffer({

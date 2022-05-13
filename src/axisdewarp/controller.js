@@ -2,7 +2,7 @@ import * as V from './vector';
 
 const [MAX_ZOOM, MIN_ZOOM] = V.degToRad([60, 2])
 const ZOOM_STEP = (MAX_ZOOM - MIN_ZOOM) / 20.0;
-const INTERVAL = 1000 / 60;
+const INTERVAL = 200;//1000 / 60;
 const SPEED = 1.0;
 
 /*
@@ -10,6 +10,8 @@ const SPEED = 1.0;
  * control its PTZ parameters.
  */
 export default function(viewer, options = {}) {
+  let running = true;
+
   const controller = {
     origin: [0, 0],
     current: [0, 0],
@@ -59,6 +61,9 @@ export default function(viewer, options = {}) {
 
   // Timer update to refresh delta
   function update() {
+    if(running) {
+      requestAnimationFrame(update);
+    }
     const currentTime = Date.now();
     const timeDelta = (currentTime - controller.lastUpdate) / 1000;
 
@@ -86,21 +91,24 @@ export default function(viewer, options = {}) {
       [ptz[0], ptz[1]] = V.add([ptz[0], ptz[1]], delta);
     }
 
-    if (z != target || zdelta || controller.delta[0] || controller.delta[1]) {
-      viewer.setPtz(ptz);
+    if (z !== target || zdelta || controller.delta[0] || controller.delta[1]) {
+      const t = viewer.getPtz();
+      if(t.reduce((a,x) => a+x, 0) !== ptz.reduce((a,x) => a+x,0)) {
+        viewer.setPtz(ptz);
+      }
     }
     controller.lastUpdate = currentTime;
   }
 
   // Attach recurrent timer update
-  const updaterID = setInterval(update, interval);
+  update();
 
   /*
    * Detach the controller from the viewer, removing all event listener and
    * cancelling the update interval.
    */
   controller.destroy = function() {
-    clearInterval(updaterID);
+    running = false;
   };
 
   return controller;
